@@ -1,3 +1,10 @@
+/**
+ * создает карточку
+ * @param cardData {Object} карточка {name, link}
+ * @param deleteCardCallback {Function} функция, которая будет вызвана при
+ *                           клике на кнопку удаления карточки
+ * @returns {HTMLElement} созданная карточка
+ */
 function createCard(cardData, deleteCardCallback) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
@@ -12,24 +19,38 @@ function createCard(cardData, deleteCardCallback) {
 
     return cardElement;
 }
-
+/**
+ * удаляет карточку
+ * @param cardElement {HTMLElement} карточка, которую необходимо удалить
+ */
 export function deleteCard(cardElement) {
     cardElement.remove();
 }
 
+/**
+ * обработчик лайка карточки
+ * @param evt {Event} событие
+ */
 export function likeCard(evt) {
-    // Обработчик лайка карточки
-}
-
-export function addCardList(cardList, placesList) {
-    cardList.forEach(addCard);
 }
 
 /**
- * @param card {Object} карточка которую мы добавляем
- * @param placesList {HTMLElement} место для вставки карточек
+ * добавляет карточки на страницу
+ * @param cardList {Array.<{name: string, link: string}>} массив карточек
+ * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
-export function addCard(card, placesList) {
+export function addCardList(cardList, cardsPlace) {
+    cardList.forEach(card => {
+        addCard(card, cardsPlace);
+    });
+}
+
+/**
+ * добавляет карточку на страницу
+ * @param card {Object} карточка {name, link}
+ * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
+ */
+export function addCard(card, cardsPlace) {
     const cardElement = createCard(card, deleteCard);
-    placesList.appendChild(cardElement);
+    cardsPlace.appendChild(cardElement);
 }
