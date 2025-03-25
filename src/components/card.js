@@ -1,11 +1,16 @@
+import {openModal} from "./modal";
+import {popupImage} from "../index";
+
 /**
  * создает карточку
  * @param cardData {Object} карточка {name, link}
  * @param deleteCardCallback {Function} функция, которая будет вызвана при
  *                           клике на кнопку удаления карточки
+ * @param likeCardCallback
+ * @param openPopupImageCallback
  * @returns {HTMLElement} созданная карточка
  */
-function createCard(cardData, deleteCardCallback) {
+function createCard(cardData, deleteCardCallback, likeCardCallback, openPopupImageCallback ) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
 
@@ -16,6 +21,13 @@ function createCard(cardData, deleteCardCallback) {
     cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
         deleteCardCallback(cardElement);
     });
+    cardElement.querySelector('.card__like-button').addEventListener('click', () => {
+        likeCardCallback(cardElement);
+    });
+
+    cardElement.querySelector('.card__image').addEventListener('click', () => {
+        openPopupImageCallback(cardData);
+    })
 
     return cardElement;
 }
@@ -29,9 +41,19 @@ export function deleteCard(cardElement) {
 
 /**
  * обработчик лайка карточки
- * @param evt {Event} событие
+ * @param cardElement {HTMLElement} карточка, которую лайкнули
  */
-export function likeCard(evt) {
+export function likeCard(cardElement) {
+    cardElement.querySelector('.card__like-button').classList.toggle('card__like-button_is-active');
+}
+
+export function openPopupImage(cardData) {
+    const image = popupImage.querySelector('.popup__image');
+    const description = popupImage.querySelector('.popup__caption');
+    image.src = cardData.link;
+    image.alt = cardData.name;
+    description.textContent = cardData.name;
+    openModal(popupImage);
 }
 
 /**
@@ -41,7 +63,8 @@ export function likeCard(evt) {
  */
 export function addCardList(cardList, cardsPlace) {
     cardList.forEach(card => {
-        addCard(card, cardsPlace);
+        const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+        cardsPlace.appendChild(cardElement);
     });
 }
 
@@ -51,6 +74,6 @@ export function addCardList(cardList, cardsPlace) {
  * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
 export function addCard(card, cardsPlace) {
-    const cardElement = createCard(card, deleteCard);
-    cardsPlace.appendChild(cardElement);
+    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+    cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
