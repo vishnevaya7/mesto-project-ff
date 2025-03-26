@@ -1,7 +1,5 @@
-// дайте пожалуйста нормальные рекомендации по модульности, как правильно распределить файлы. Я очень путаюсь :(
-
 import './pages/index.css';
-import { deleteCard, likeCard, createCard, openPopupImage } from './components/card.js';
+import { deleteCard, likeCard, createCard} from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
 import {initialCards} from "./components/data";
 
@@ -23,14 +21,22 @@ const addCardButton = document.querySelector('.profile__add-button');
 nameInput.value = profileTitle.textContent;
 jobInput.value = profileDescription.textContent;
 
-export const popupImage = document.querySelector('.popup_type_image');
+const popupImage = document.querySelector('.popup_type_image');
+const image = popupImage.querySelector('.popup__image');
+const description = popupImage.querySelector('.popup__caption');
 
+function openPopupImage(cardData) {
+    image.src = cardData.link;
+    image.alt = cardData.name;
+    description.textContent = cardData.name;
+    openModal(popupImage);
+}
 /**
  * добавляет карточки на страницу
  * @param cardList {Array.<{name: string, link: string}>} массив карточек
  * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
-export function addCardList(cardList, cardsPlace) {
+function addCardList(cardList, cardsPlace) {
     cardList.forEach(card => {
         const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
         cardsPlace.appendChild(cardElement);
@@ -42,7 +48,7 @@ export function addCardList(cardList, cardsPlace) {
  * @param card {Object} карточка {name, link}
  * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
-export function addCard(card, cardsPlace) {
+function addCard(card, cardsPlace) {
     const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
     cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
@@ -72,11 +78,7 @@ popups.forEach((popup) => {
             closeModal(popup.popupElement);
         }
     })
-    document.addEventListener('keydown', (evt) => {
-        if (evt.key === 'Escape') {
-            closeModal(popup.popupElement);
-        }
-    })
+
 })
 
 function handleEditProfileFormSubmit(evt) {
@@ -110,3 +112,5 @@ function handleAddNewPlaceFormSubmit(evt) {
 }
 
 newPlaceForm.addEventListener('submit', handleAddNewPlaceFormSubmit);
+
+

@@ -1,5 +1,3 @@
-import {openModal} from "./modal";
-import {popupImage} from "../index";
 
 /**
  * создает карточку
@@ -47,12 +45,5 @@ export function likeCard(cardElement) {
     cardElement.querySelector('.card__like-button').classList.toggle('card__like-button_is-active');
 }
 
-export function openPopupImage(cardData) {
-    const image = popupImage.querySelector('.popup__image');
-    const description = popupImage.querySelector('.popup__caption');
-    image.src = cardData.link;
-    image.alt = cardData.name;
-    description.textContent = cardData.name;
-    openModal(popupImage);
-}
+
 
