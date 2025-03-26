@@ -1,6 +1,9 @@
+// дайте пожалуйста нормальные рекомендации по модульности, как правильно распределить файлы. Я очень путаюсь :(
+
 import './pages/index.css';
-import {addCard, deleteCard, likeCard, addCardList} from './components/card.js';
+import { deleteCard, likeCard, createCard, openPopupImage } from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
+import {initialCards} from "./components/data";
 
 const cardsPlace = document.querySelector('.places__list');
 
@@ -21,36 +24,28 @@ nameInput.value = profileTitle.textContent;
 jobInput.value = profileDescription.textContent;
 
 export const popupImage = document.querySelector('.popup_type_image');
-const popupImageCloseButton = popupImage.querySelector('.popup__close')
-const cardImage = document.querySelector('.places__list');
 
+/**
+ * добавляет карточки на страницу
+ * @param cardList {Array.<{name: string, link: string}>} массив карточек
+ * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
+ */
+export function addCardList(cardList, cardsPlace) {
+    cardList.forEach(card => {
+        const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+        cardsPlace.appendChild(cardElement);
+    });
+}
 
-const initialCards = [
-    {
-        name: "Архыз",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
-    },
-    {
-        name: "Челябинская область",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/chelyabinsk-oblast.jpg",
-    },
-    {
-        name: "Иваново",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/ivanovo.jpg",
-    },
-    {
-        name: "Камчатка",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg",
-    },
-    {
-        name: "Холмогорский район",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kholmogorsky-rayon.jpg",
-    },
-    {
-        name: "Байкал",
-        link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
-    }
-];
+/**
+ * добавляет карточку на страницу
+ * @param card {Object} карточка {name, link}
+ * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
+ */
+export function addCard(card, cardsPlace) {
+    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+    cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
+}
 
 addCardList(initialCards, cardsPlace);
 
@@ -65,8 +60,6 @@ const popups = [
     },
     {
         popupElement: popupImage,
-
-
     }
 ]
 

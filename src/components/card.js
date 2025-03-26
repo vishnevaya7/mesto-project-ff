@@ -10,7 +10,7 @@ import {popupImage} from "../index";
  * @param openPopupImageCallback
  * @returns {HTMLElement} созданная карточка
  */
-function createCard(cardData, deleteCardCallback, likeCardCallback, openPopupImageCallback ) {
+export function createCard(cardData, deleteCardCallback, likeCardCallback, openPopupImageCallback ) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
 
@@ -56,24 +56,3 @@ export function openPopupImage(cardData) {
     openModal(popupImage);
 }
 
-/**
- * добавляет карточки на страницу
- * @param cardList {Array.<{name: string, link: string}>} массив карточек
- * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
- */
-export function addCardList(cardList, cardsPlace) {
-    cardList.forEach(card => {
-        const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
-        cardsPlace.appendChild(cardElement);
-    });
-}
-
-/**
- * добавляет карточку на страницу
- * @param card {Object} карточка {name, link}
- * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
- */
-export function addCard(card, cardsPlace) {
-    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
-    cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
-}
