@@ -1,7 +1,8 @@
 import './pages/index.css';
-import { deleteCard, likeCard, createCard} from './components/card.js';
+import {deleteCard, likeCard, createCard} from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
 import {initialCards} from "./components/data";
+import {enableValidation} from "./components/validation";
 
 const cardsPlace = document.querySelector('.places__list');
 
@@ -31,6 +32,7 @@ function openPopupImage(cardData) {
     description.textContent = cardData.name;
     openModal(popupImage);
 }
+
 /**
  * добавляет карточки на страницу
  * @param cardList {Array.<{name: string, link: string}>} массив карточек
@@ -58,7 +60,10 @@ addCardList(initialCards, cardsPlace);
 const popups = [
     {
         popupElement: popupEdit,
-        openButton: editProfileButton
+        openButton: editProfileButton,
+        popupSettings:{
+
+        },
     },
     {
         popupElement: popupNewCard,
@@ -71,7 +76,9 @@ const popups = [
 
 popups.forEach((popup) => {
     if (popup.openButton) {
-        popup.openButton.addEventListener('click', () => openModal(popup.popupElement));
+        popup.openButton.addEventListener('click', () => {
+            openModal(popup.popupElement)
+        });
     }
     popup.popupElement.addEventListener('click', (evt) => {
         if (evt.target.classList.contains('popup') || evt.target.classList.contains('popup__close')) {
@@ -112,5 +119,15 @@ function handleAddNewPlaceFormSubmit(evt) {
 }
 
 newPlaceForm.addEventListener('submit', handleAddNewPlaceFormSubmit);
+
+
+enableValidation({
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+});
 
 
