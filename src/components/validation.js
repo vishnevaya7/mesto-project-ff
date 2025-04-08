@@ -1,9 +1,28 @@
+function showInputError(errorElement, inputElement, settings) {
+    errorElement.textContent = inputElement.validationMessage;
+    inputElement.classList.add(settings.inputErrorClass);
+    errorElement.classList.add(settings.errorClass);
+}
 
-function toggleButtonState(inputList, buttonElement) {
+function hideInputError(errorElement, inputElement, settings) {
+    inputElement.classList.remove(settings.inputErrorClass);
+    errorElement.classList.remove(settings.errorClass);
+    errorElement.textContent = '';
+}
+
+export function clearValidation (form, settings) {
+    form.reset();
+    const buttonElement = form.querySelector(settings.submitButtonSelector);
+    buttonElement.classList.add(settings.inactiveButtonClass);
+}
+
+function toggleButtonState(inputList, buttonElement, inactiveButtonClass) {
     if (hasInvalidInput(inputList)) {
-        buttonElement.classList.add('button_inactive');
+        buttonElement.classList.add(inactiveButtonClass);
+        buttonElement.disabled = true;
     } else {
-        buttonElement.classList.remove('button_inactive');
+        buttonElement.classList.remove(inactiveButtonClass);
+        buttonElement.disabled = false;
     }
 }
 
@@ -21,18 +40,18 @@ export function enableValidation(settings) {
 
         inputElements.forEach(inputElement => {
             inputElement.addEventListener('input', () => {
-
-                    checkValidity(inputElement,form);
-
-                    toggleButtonState(inputElements, buttonElement);
+                    checkValidity(inputElement, form, settings);
+                    toggleButtonState(inputElements, buttonElement, settings.inactiveButtonClass);
                 }
             )
         })
     })
 }
 
-function checkValidity(inputElement, form) {
-    if (!inputElement.isValid) {
+function checkValidity(inputElement, form, settings) {
+    const errorElement = form.querySelector(`.${inputElement.id}-error`);
+    if (!inputElement.validity.valid) {
+        inputElement.classList.add(settings.inputErrorClass);
         if (inputElement.validity.tooShort || inputElement.validity.tooLong) {
             inputElement.setCustomValidity(inputElement.dataset.lengthError
                 .replace('{minlength}', inputElement.minLength)
@@ -47,8 +66,8 @@ function checkValidity(inputElement, form) {
         } else {
             inputElement.setCustomValidity("");
         }
-        const errorElement = form.querySelector(`.${inputElement.id}-error`);
-        errorElement.textContent = inputElement.validationMessage;
-        errorElement.classList.add(settings.errorClass);
+        showInputError(errorElement, inputElement, settings);
+    } else {
+        hideInputError(errorElement, inputElement, settings);
     }
 }
