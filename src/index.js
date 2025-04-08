@@ -28,8 +28,7 @@ const editProfileButton = document.querySelector('.profile__edit-button');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const addCardButton = document.querySelector('.profile__add-button');
 
-nameInput.value = profileTitle.textContent;
-jobInput.value = profileDescription.textContent;
+
 
 const popupImage = document.querySelector('.popup_type_image');
 const image = popupImage.querySelector('.popup__image');
@@ -82,9 +81,14 @@ const popups = [
 
 popups.forEach((popup) => {
     if (popup.openButton) {
+
         popup.openButton.addEventListener('click', () => {
+            if (popup.popupElement===popupEdit) {
+                nameInput.value = profileTitle.textContent;
+                jobInput.value = profileDescription.textContent;
+            }
             clearValidation(popup.popupElement.querySelector('form'),validationConfig);
-            openModal(popup.popupElement)
+            openModal(popup.popupElement);
         });
     }
     popup.popupElement.addEventListener('click', (evt) => {

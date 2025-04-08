@@ -11,8 +11,12 @@ function hideInputError(errorElement, inputElement, settings) {
 }
 
 export function clearValidation (form, settings) {
-    form.reset();
     const buttonElement = form.querySelector(settings.submitButtonSelector);
+    const inputElements = Array.from(form.querySelectorAll(settings.inputSelector));
+    inputElements.forEach(inputElement => {
+        const errorElement = form.querySelector(`.${inputElement.id}-error`);
+        hideInputError(errorElement, inputElement, settings);
+    })
     buttonElement.classList.add(settings.inactiveButtonClass);
 }
 
@@ -50,6 +54,7 @@ export function enableValidation(settings) {
 
 function checkValidity(inputElement, form, settings) {
     const errorElement = form.querySelector(`.${inputElement.id}-error`);
+    inputElement.setCustomValidity('');
     if (!inputElement.validity.valid) {
         inputElement.classList.add(settings.inputErrorClass);
         if (inputElement.validity.tooShort || inputElement.validity.tooLong) {
