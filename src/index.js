@@ -1,8 +1,8 @@
 import './pages/index.css';
 import {deleteCard, likeCard, createCard} from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
-import {initialCards} from "./components/data";
 import {clearValidation, enableValidation} from "./components/validation";
+import {getCardsAndDoSomething, getUserData, sendUserData} from "./components/api";
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -17,10 +17,12 @@ const cardsPlace = document.querySelector('.places__list');
 
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
+// const profileImage = document.querySelector('.profile__image');
+
 
 const editProfileForm = document.forms['edit-profile'];
 const nameInput = editProfileForm.name;
-const jobInput = editProfileForm.description;
+const aboutInput = editProfileForm.description;
 
 const popupEdit = document.querySelector('.popup_type_edit');
 const editProfileButton = document.querySelector('.profile__edit-button');
@@ -34,6 +36,15 @@ const popupImage = document.querySelector('.popup_type_image');
 const image = popupImage.querySelector('.popup__image');
 const description = popupImage.querySelector('.popup__caption');
 
+function updateUserData() {
+    getUserData((data) => {
+        profileTitle.textContent = data.name;
+        profileDescription.textContent = data.about;
+//     TODO: profileImage.src = data.avatar
+    })
+}
+updateUserData();
+
 function openPopupImage(cardData) {
     image.src = cardData.link;
     image.alt = cardData.name;
@@ -44,9 +55,8 @@ function openPopupImage(cardData) {
 /**
  * добавляет карточки на страницу
  * @param cardList {Array.<{name: string, link: string}>} массив карточек
- * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
-function addCardList(cardList, cardsPlace) {
+function addCardList(cardList) {
     cardList.forEach(card => {
         const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
         cardsPlace.appendChild(cardElement);
@@ -56,14 +66,13 @@ function addCardList(cardList, cardsPlace) {
 /**
  * добавляет карточку на страницу
  * @param card {Object} карточка {name, link}
- * @param cardsPlace {HTMLElement} контейнер, в который добавляются карточки
  */
-function addCard(card, cardsPlace) {
+function addCard(card) {
     const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
     cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
 
-addCardList(initialCards, cardsPlace);
+getCardsAndDoSomething(addCardList);
 
 const popups = [
     {
@@ -85,7 +94,7 @@ popups.forEach((popup) => {
         popup.openButton.addEventListener('click', () => {
             if (popup.popupElement===popupEdit) {
                 nameInput.value = profileTitle.textContent;
-                jobInput.value = profileDescription.textContent;
+                aboutInput.value = profileDescription.textContent;
             }
             clearValidation(popup.popupElement.querySelector('form'),validationConfig);
             openModal(popup.popupElement);
@@ -103,10 +112,16 @@ function handleEditProfileFormSubmit(evt) {
     evt.preventDefault();
 
     const name = nameInput.value;
-    const job = jobInput.value;
+    const about = aboutInput.value;
 
-    profileTitle.textContent = name;
-    profileDescription.textContent = job;
+    sendUserData(name, about,(data) => {
+        profileTitle.textContent = data.name;
+        profileDescription.textContent = data.about;
+//     TODO: profileImage.src = data.avatar
+    });
+
+    // profileTitle.textContent = name;
+    // profileDescription.textContent = about;
 
     closeModal(popupEdit);
 }
