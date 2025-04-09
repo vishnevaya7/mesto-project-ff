@@ -1,0 +1,17 @@
+.profile__image-avatar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('../../../../images/edit-icon.svg');
+    opacity: 0; /* Иконка изначально невидима */
+    transition: opacity 0.3s ease; /* Плавное появление */
+    pointer-events: none; /* Чтобы иконка не перехватывала события мыши */
+}
+
+.profile__image:hover .profile__image-avatar {
+    opacity: 1; /* Показываем иконку при наведении */
+}

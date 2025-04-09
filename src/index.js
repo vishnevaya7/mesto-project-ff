@@ -2,7 +2,7 @@ import './pages/index.css';
 import {deleteCard, likeCard, createCard} from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
 import {clearValidation, enableValidation} from "./components/validation";
-import {getCardsAndDoSomething, getUserData, sendUserData} from "./components/api";
+import {getCardsAndDoSomething, getUserData, likeCardApi, sendNewCard, sendUserData, deleteLikeCardApi, deleteCardApi} from "./components/api";
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -58,7 +58,7 @@ function openPopupImage(cardData) {
  */
 function addCardList(cardList) {
     cardList.forEach(card => {
-        const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+        const cardElement = createCard(card, deleteCard, likeCard, openPopupImage, likeCardApi, deleteLikeCardApi, deleteCardApi);
         cardsPlace.appendChild(cardElement);
     });
 }
@@ -67,8 +67,8 @@ function addCardList(cardList) {
  * добавляет карточку на страницу
  * @param card {Object} карточка {name, link}
  */
-function addCard(card) {
-    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage);
+function addCard(card) {debugger;
+    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage, likeCardApi, deleteLikeCardApi, deleteCardApi);
     cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
 
@@ -117,11 +117,9 @@ function handleEditProfileFormSubmit(evt) {
     sendUserData(name, about,(data) => {
         profileTitle.textContent = data.name;
         profileDescription.textContent = data.about;
+
 //     TODO: profileImage.src = data.avatar
     });
-
-    // profileTitle.textContent = name;
-    // profileDescription.textContent = about;
 
     closeModal(popupEdit);
 }
@@ -134,11 +132,9 @@ const imageUrlInput = newPlaceForm.link;
 
 function handleAddNewPlaceFormSubmit(evt) {
     evt.preventDefault();
+debugger;
 
-    addCard({
-        name: placeNameInput.value,
-        link: imageUrlInput.value
-    }, cardsPlace)
+    sendNewCard(placeNameInput.value, imageUrlInput.value, addCard);
 
     closeModal(popupNewCard);
     newPlaceForm.reset()
