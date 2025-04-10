@@ -10,7 +10,7 @@ function hideInputError(errorElement, inputElement, settings) {
     errorElement.textContent = '';
 }
 
-export function clearValidation (form, settings) {
+export function clearValidation(form, settings) {
     const buttonElement = form.querySelector(settings.submitButtonSelector);
     const inputElements = Array.from(form.querySelectorAll(settings.inputSelector));
     inputElements.forEach(inputElement => {

@@ -5,12 +5,22 @@ const url = `https://mesto.nomoreparties.co/v1/${groupId}`;
 export function loadInitialData() {
     return Promise.all([
         fetch(`${url}/users/me`, {
-            headers: { authorization: token }
-        }).then(res => res.json()),
+            headers: {authorization: token}
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        }),
 
         fetch(`${url}/cards`, {
-            headers: { authorization: token }
-        }).then(res => res.json())
+            headers: {authorization: token}
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
     ]);
 }
 
@@ -23,9 +33,14 @@ export function sendUserData(name, about, callback, unblockButton) {
         },
         body: JSON.stringify({name, about})
     })
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
         .then(data => callback(data))
-        .catch(err => console.log(err))
+        .catch(err => console.error(err))
         .finally(() => {
             unblockButton()
         })
@@ -44,18 +59,20 @@ export function sendNewCard(name, link, callback, unblockButton) {
             link: link
         })
     })
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
         .then(data => {
             callback(data);
         })
-        .catch(err => {
-            console.log(err);
-        })
+        .catch(err => console.error(err))
         .finally(() => {
             unblockButton()
         })
 }
-
 
 export function likeCardApi(card, callback) {
     fetch(`${url}/cards/likes/${card.id}`, {
@@ -66,13 +83,16 @@ export function likeCardApi(card, callback) {
             },
         }
     )
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
         .then(data => {
             callback(data);
         })
-        .catch(err => {
-            console.log(err);
-        });
+        .catch(err => console.error(err))
 }
 
 export function deleteLikeCardApi(card, callback) {
@@ -84,13 +104,16 @@ export function deleteLikeCardApi(card, callback) {
             },
         }
     )
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
         .then(data => {
             callback(data);
         })
-        .catch(err => {
-            console.log(err);
-        });
+        .catch(err => console.error(err))
 }
 
 export function deleteCardApi(card, callback) {
@@ -105,13 +128,12 @@ export function deleteCardApi(card, callback) {
         .then(res => {
                 if (res.ok) {
                     callback(card);
+                } else {
+                    return Promise.reject(`Ошибка: ${res.status}`);
                 }
             }
         )
-
-        .catch(err => {
-            console.log(err);
-        });
+        .catch(err => console.error(err))
 }
 
 export function changeAvatar(link, callback, unblockButton) {
@@ -125,13 +147,16 @@ export function changeAvatar(link, callback, unblockButton) {
             avatar: link
         })
     })
-        .then(res => res.json())
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
         .then(data => {
             callback(data);
         })
-        .catch(err => {
-            console.log(err);
-        })
+        .catch(err => console.error(err))
         .finally(() => {
             unblockButton()
         })

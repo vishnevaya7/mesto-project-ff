@@ -1,17 +1,5 @@
-
-
-/**
- * создает карточку
- * @param cardData {Object} карточка {name, link, likes}
- * @param deleteCardCallback {Function} функция, которая будет вызвана при
- *                           клике на кнопку удаления карточки
- * @param likeCardCallback
- * @param openPopupImageCallback
- * @param likeCardApi
- * @param deleteLikeCardApi
- * @returns {HTMLElement} созданная карточка
- */
-export function createCard(cardData, deleteCardCallback, likeCardCallback, openPopupImageCallback, likeCardApi, deleteLikeCardApi, deleteCardApi) {
+export function createCard(cardData, deleteCardCallback, likeCardCallback, openPopupImageCallback, likeCardApi,
+                           deleteLikeCardApi, deleteCardApi) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');

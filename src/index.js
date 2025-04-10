@@ -80,7 +80,6 @@ function addCard(card) {
     cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
 
-
 loadInitialData().then(([user, cards]) => {
     localStorage.setItem('userId', user._id);
     addCardList(cards);
@@ -88,6 +87,7 @@ loadInitialData().then(([user, cards]) => {
     profileDescription.textContent = user.about;
     profileImage.style.backgroundImage = `url(${user.avatar})`;
 })
+    .catch(err => console.error(err))
 
 
 const popups = [
@@ -149,7 +149,6 @@ function handleEditProfileFormSubmit(evt) {
 
 }
 
-
 newPlaceForm.addEventListener('submit', handleAddNewPlaceFormSubmit);
 
 function handleAddNewPlaceFormSubmit(evt) {
@@ -164,7 +163,6 @@ function handleAddNewPlaceFormSubmit(evt) {
         });
 
 }
-
 
 editImageForm.addEventListener('submit', handleEditImageFormSubmit);
 
@@ -184,7 +182,6 @@ function handleEditImageFormSubmit(evt) {
     );
 }
 
-
 function unblockButton(button) {
     return () => {
         button.disabled = false;
@@ -198,7 +195,6 @@ function blockButton(button) {
     button.textContent = 'Сохранить...';
 
 }
-
 
 enableValidation(validationConfig);
 
