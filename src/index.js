@@ -61,7 +61,7 @@ function openPopupImage(cardData) {
 }
 
 
-const insertMetod = {
+const insertMethod = {
     before: (card) => cardsPlace.insertBefore(card, cardsPlace.firstChild),
     after: (card) => cardsPlace.appendChild(card)
 }
@@ -76,7 +76,7 @@ function addCards(insertMethod, ...card) {
 
 loadInitialData().then(([user, cards]) => {
     localStorage.setItem('userId', user._id);
-    addCards(insertMetod.after, ...cards);
+    addCards(insertMethod.after, ...cards);
     profileTitle.textContent = user.name;
     profileDescription.textContent = user.about;
     profileImage.style.backgroundImage = `url(${user.avatar})`;
@@ -152,7 +152,7 @@ function handleAddNewPlaceFormSubmit(evt) {
 
     sendNewCard(placeNameInput.value, imageUrlInput.value)
         .then(data => {
-            addCards(insertMetod.before, data);
+            addCards(insertMethod.before, data);
             closeModal(popupNewCard);
             newPlaceForm.reset();
         })
