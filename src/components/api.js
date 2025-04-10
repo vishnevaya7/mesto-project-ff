@@ -2,47 +2,19 @@ const token = 'da212393-1eb9-449c-8d8b-222ff76518eb';
 const groupId = 'wff-cohort-35';
 const url = `https://mesto.nomoreparties.co/v1/${groupId}`;
 
+export function loadInitialData() {
+    return Promise.all([
+        fetch(`${url}/users/me`, {
+            headers: { authorization: token }
+        }).then(res => res.json()),
 
-//{
-//   name: 'Jacques Cousteau',
-//   about: 'Sailor, researcher',
-//   avatar: 'https://pictures.s3.yandex.net/frontend-developer/common/ava.jpg',
-//   _id: 'a29fe00f41e588cd2350ff01',
-//   cohort: 'wff-cohort-35'
-// }
-
-export function getUserData(callback) {
-    fetch(`${url}/users/me`, {
-        headers: {
-            authorization: token
-        }
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            callback(data);
-        })
-        .catch(err => {
-            console.err(err);
-        });
+        fetch(`${url}/cards`, {
+            headers: { authorization: token }
+        }).then(res => res.json())
+    ]);
 }
 
-export function getCardsAndDoSomething(callback) {
-    fetch(`${url}/cards`, {
-        headers: {
-            authorization: token
-        }
-    })
-        .then(res => res.json())
-        .then(data => {
-            callback(data);
-        })
-        .catch(err => {
-            console.log(err);
-        });
-}
-
-export function sendUserData(name, about, callback) {
+export function sendUserData(name, about, callback, unblockButton) {
     fetch(`${url}/users/me`, {
         method: 'PATCH',
         headers: {
@@ -53,10 +25,14 @@ export function sendUserData(name, about, callback) {
     })
         .then(res => res.json())
         .then(data => callback(data))
-        .catch(err => console.log(err));
+        .catch(err => console.log(err))
+        .finally(() => {
+            unblockButton()
+        })
+
 }
 
-export function sendNewCard(name, link, callback) {
+export function sendNewCard(name, link, callback, unblockButton) {
     fetch(`${url}/cards`, {
         method: 'POST',
         headers: {
@@ -74,7 +50,10 @@ export function sendNewCard(name, link, callback) {
         })
         .catch(err => {
             console.log(err);
-        });
+        })
+        .finally(() => {
+            unblockButton()
+        })
 }
 
 
@@ -135,7 +114,7 @@ export function deleteCardApi(card, callback) {
         });
 }
 
-export function changeAvatar(link, callback) {
+export function changeAvatar(link, callback, unblockButton) {
     fetch(`${url}/users/me/avatar`, {
         method: 'PATCH',
         headers: {
@@ -152,8 +131,13 @@ export function changeAvatar(link, callback) {
         })
         .catch(err => {
             console.log(err);
-        });
+        })
+        .finally(() => {
+            unblockButton()
+        })
 }
+
+
 
 
 

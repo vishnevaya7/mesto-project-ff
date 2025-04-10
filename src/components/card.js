@@ -21,10 +21,10 @@ export function createCard(cardData, deleteCardCallback, likeCardCallback, openP
     cardImage.src = cardData.link;
     cardImage.alt = cardData.name;
     cardLikeCount.textContent = cardData.likes.length;
-    if (cardData.owner._id !== "a29fe00f41e588cd2350ff01") {
+    if (cardData.owner._id !== localStorage.getItem('userId')) {
         cardElement.querySelector('.card__delete-button').style.display = 'none';
     }
-    if (cardData.likes.some(like => like._id === "a29fe00f41e588cd2350ff01")) {
+    if (cardData.likes.some(like => like._id === localStorage.getItem('userId'))) {
         likeCard(cardElement);
     }
     cardElement.querySelector('.card__title').textContent = cardData.name;

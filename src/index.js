@@ -2,7 +2,13 @@ import './pages/index.css';
 import {deleteCard, likeCard, createCard} from './components/card.js';
 import {openModal, closeModal} from './components/modal.js';
 import {clearValidation, enableValidation} from "./components/validation";
-import {getCardsAndDoSomething, getUserData, likeCardApi, sendNewCard, sendUserData, deleteLikeCardApi, deleteCardApi} from "./components/api";
+import {
+    likeCardApi,
+    sendNewCard,
+    sendUserData,
+    deleteLikeCardApi,
+    deleteCardApi, changeAvatar, loadInitialData
+} from "./components/api";
 
 const validationConfig = {
     formSelector: '.popup__form',
@@ -17,12 +23,16 @@ const cardsPlace = document.querySelector('.places__list');
 
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
-// const profileImage = document.querySelector('.profile__image');
+const profileImage = document.querySelector('.profile__image');
 
 
 const editProfileForm = document.forms['edit-profile'];
 const nameInput = editProfileForm.name;
 const aboutInput = editProfileForm.description;
+
+const popupEditImage = document.querySelector('.popup_type_edit-image');
+const editImageButton = document.querySelector('.profile__image-container');
+
 
 const popupEdit = document.querySelector('.popup_type_edit');
 const editProfileButton = document.querySelector('.profile__edit-button');
@@ -31,19 +41,17 @@ const popupNewCard = document.querySelector('.popup_type_new-card');
 const addCardButton = document.querySelector('.profile__add-button');
 
 
-
 const popupImage = document.querySelector('.popup_type_image');
 const image = popupImage.querySelector('.popup__image');
 const description = popupImage.querySelector('.popup__caption');
 
-function updateUserData() {
-    getUserData((data) => {
-        profileTitle.textContent = data.name;
-        profileDescription.textContent = data.about;
-//     TODO: profileImage.src = data.avatar
-    })
-}
-updateUserData();
+
+const editImageForm = document.forms['edit-avatar'];
+const avatarUrlInput = editImageForm.link;
+
+const newPlaceForm = document.forms['new-place'];
+const placeNameInput = newPlaceForm['place-name'];
+const imageUrlInput = newPlaceForm.link;
 
 function openPopupImage(cardData) {
     image.src = cardData.link;
@@ -67,12 +75,20 @@ function addCardList(cardList) {
  * добавляет карточку на страницу
  * @param card {Object} карточка {name, link}
  */
-function addCard(card) {debugger;
+function addCard(card) {
     const cardElement = createCard(card, deleteCard, likeCard, openPopupImage, likeCardApi, deleteLikeCardApi, deleteCardApi);
     cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
 }
 
-getCardsAndDoSomething(addCardList);
+
+loadInitialData().then(([user, cards]) => {
+    localStorage.setItem('userId', user._id);
+    addCardList(cards);
+    profileTitle.textContent = user.name;
+    profileDescription.textContent = user.about;
+    profileImage.style.backgroundImage = `url(${user.avatar})`;
+})
+
 
 const popups = [
     {
@@ -85,6 +101,10 @@ const popups = [
     },
     {
         popupElement: popupImage,
+    },
+    {
+        popupElement: popupEditImage,
+        openButton: editImageButton
     }
 ]
 
@@ -92,11 +112,11 @@ popups.forEach((popup) => {
     if (popup.openButton) {
 
         popup.openButton.addEventListener('click', () => {
-            if (popup.popupElement===popupEdit) {
+            if (popup.popupElement === popupEdit) {
                 nameInput.value = profileTitle.textContent;
                 aboutInput.value = profileDescription.textContent;
             }
-            clearValidation(popup.popupElement.querySelector('form'),validationConfig);
+            clearValidation(popup.popupElement.querySelector('form'), validationConfig);
             openModal(popup.popupElement);
         });
     }
@@ -105,42 +125,79 @@ popups.forEach((popup) => {
             closeModal(popup.popupElement);
         }
     })
-
 })
 
+
+editProfileForm.addEventListener('submit', handleEditProfileFormSubmit);
+
 function handleEditProfileFormSubmit(evt) {
+    blockButton(editProfileForm.querySelector(".button"));
     evt.preventDefault();
 
     const name = nameInput.value;
     const about = aboutInput.value;
 
-    sendUserData(name, about,(data) => {
-        profileTitle.textContent = data.name;
-        profileDescription.textContent = data.about;
+    sendUserData(name, about, (data) => {
+            profileTitle.textContent = data.name;
+            profileDescription.textContent = data.about;
+        },
+        () => {
+            unblockButton(editProfileForm.querySelector(".button"))
+            closeModal(popupEdit);
+        }
+    );
 
-//     TODO: profileImage.src = data.avatar
-    });
-
-    closeModal(popupEdit);
 }
 
-editProfileForm.addEventListener('submit', handleEditProfileFormSubmit);
-
-const newPlaceForm = document.forms['new-place'];
-const placeNameInput = newPlaceForm['place-name'];
-const imageUrlInput = newPlaceForm.link;
-
-function handleAddNewPlaceFormSubmit(evt) {
-    evt.preventDefault();
-debugger;
-
-    sendNewCard(placeNameInput.value, imageUrlInput.value, addCard);
-
-    closeModal(popupNewCard);
-    newPlaceForm.reset()
-}
 
 newPlaceForm.addEventListener('submit', handleAddNewPlaceFormSubmit);
+
+function handleAddNewPlaceFormSubmit(evt) {
+    blockButton(newPlaceForm.querySelector(".button"));
+    evt.preventDefault();
+
+    sendNewCard(placeNameInput.value, imageUrlInput.value, addCard,
+        () => {
+            unblockButton(newPlaceForm.querySelector(".button"))
+            closeModal(popupNewCard);
+            newPlaceForm.reset()
+        });
+
+}
+
+
+editImageForm.addEventListener('submit', handleEditImageFormSubmit);
+
+function handleEditImageFormSubmit(evt) {
+    blockButton(editImageForm.querySelector(".button"));
+    evt.preventDefault();
+
+    changeAvatar(avatarUrlInput.value,
+        (data) => {
+            profileImage.style.backgroundImage = `url(${data.avatar})`;
+        },
+        () => {
+            unblockButton(editImageForm.querySelector(".button"))
+            closeModal(popupEditImage);
+            editImageForm.reset();
+        }
+    );
+}
+
+
+function unblockButton(button) {
+    return () => {
+        button.disabled = false;
+        button.textContent = 'Сохранить';
+    }
+}
+
+function blockButton(button) {
+
+    button.disabled = true;
+    button.textContent = 'Сохранить...';
+
+}
 
 
 enableValidation(validationConfig);
