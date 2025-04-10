@@ -60,29 +60,23 @@ function openPopupImage(cardData) {
     openModal(popupImage);
 }
 
-/**
- * добавляет карточки на страницу
- * @param cardList {Array.<{name: string, link: string}>} массив карточек
- */
-function addCardList(cardList) {
-    cardList.forEach(card => {
+
+const insertMetod = {
+    before: (card) => cardsPlace.insertBefore(card, cardsPlace.firstChild),
+    after: (card) => cardsPlace.appendChild(card)
+}
+
+function addCards(insertMethod, ...card) {
+    card.forEach(card => {
         const cardElement = createCard(card, deleteCard, likeCard, openPopupImage, likeCardApi, deleteLikeCardApi, deleteCardApi);
-        cardsPlace.appendChild(cardElement);
+        insertMethod(cardElement);
     });
 }
 
-/**
- * добавляет карточку на страницу
- * @param card {Object} карточка {name, link}
- */
-function addCard(card) {
-    const cardElement = createCard(card, deleteCard, likeCard, openPopupImage, likeCardApi, deleteLikeCardApi, deleteCardApi);
-    cardsPlace.insertBefore(cardElement, cardsPlace.firstChild);
-}
 
 loadInitialData().then(([user, cards]) => {
     localStorage.setItem('userId', user._id);
-    addCardList(cards);
+    addCards(insertMetod.after, ...cards);
     profileTitle.textContent = user.name;
     profileDescription.textContent = user.about;
     profileImage.style.backgroundImage = `url(${user.avatar})`;
@@ -137,15 +131,16 @@ function handleEditProfileFormSubmit(evt) {
     const name = nameInput.value;
     const about = aboutInput.value;
 
-    sendUserData(name, about, (data) => {
+    sendUserData(name, about)
+        .then(data => {
             profileTitle.textContent = data.name;
             profileDescription.textContent = data.about;
-        },
-        () => {
-            unblockButton(editProfileForm.querySelector(".button"))
             closeModal(popupEdit);
-        }
-    );
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+            unblockButton(editProfileForm.querySelector(".button"))
+        });
 
 }
 
@@ -155,11 +150,16 @@ function handleAddNewPlaceFormSubmit(evt) {
     blockButton(newPlaceForm.querySelector(".button"));
     evt.preventDefault();
 
-    sendNewCard(placeNameInput.value, imageUrlInput.value, addCard,
-        () => {
-            unblockButton(newPlaceForm.querySelector(".button"))
+    sendNewCard(placeNameInput.value, imageUrlInput.value)
+        .then(data => {
+            addCards(insertMetod.before, data);
             closeModal(popupNewCard);
-            newPlaceForm.reset()
+            newPlaceForm.reset();
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+            unblockButton(newPlaceForm.querySelector(".button"))
+
         });
 
 }
@@ -170,16 +170,16 @@ function handleEditImageFormSubmit(evt) {
     blockButton(editImageForm.querySelector(".button"));
     evt.preventDefault();
 
-    changeAvatar(avatarUrlInput.value,
-        (data) => {
+    changeAvatar(avatarUrlInput.value)
+        .then(data => {
             profileImage.style.backgroundImage = `url(${data.avatar})`;
-        },
-        () => {
-            unblockButton(editImageForm.querySelector(".button"))
             closeModal(popupEditImage);
             editImageForm.reset();
-        }
-    );
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+            unblockButton(editImageForm.querySelector(".button"))
+        });
 }
 
 function unblockButton(button) {

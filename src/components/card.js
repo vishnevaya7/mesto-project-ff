@@ -18,18 +18,32 @@ export function createCard(cardData, deleteCardCallback, likeCardCallback, openP
     cardElement.querySelector('.card__title').textContent = cardData.name;
 
     cardElement.querySelector('.card__delete-button').addEventListener('click', () => {
-        deleteCardApi(cardElement, deleteCardCallback);
+        deleteCardApi(cardElement)
+            .then(res => {
+                    if (res.ok) {
+                        deleteCardCallback(cardElement);
+                    } else {
+                        return Promise.reject(`Ошибка: ${res.status}`);
+                    }
+                }
+            )
+            .catch(err => console.error(err));
     });
     cardElement.querySelector('.card__like-button').addEventListener('click', () => {
-        if (likeCardCallback(cardElement)) {
-            likeCardApi(cardElement, (data) => {
-                cardLikeCount.textContent = data.likes.length;
-            });
-
+        if (isLiked(cardElement)) {
+            deleteLikeCardApi(cardElement)
+                .then(data => {
+                    cardLikeCount.textContent = data.likes.length;
+                    likeCard(cardElement);
+                })
+                .catch(err => console.error(err));
         } else {
-            deleteLikeCardApi(cardElement, (data) => {
-                cardLikeCount.textContent = data.likes.length;
-            })
+            likeCardApi(cardElement)
+                .then(data => {
+                    cardLikeCount.textContent = data.likes.length;
+                    likeCard(cardElement);
+                })
+                .catch(err => console.error(err));
         }
     });
 
@@ -53,8 +67,12 @@ export function deleteCard(cardElement) {
  * @param cardElement {HTMLElement} карточка, которую лайкнули
  */
 export function likeCard(cardElement) {
-    let likeButton = cardElement.querySelector('.card__like-button')
+    const likeButton = cardElement.querySelector('.card__like-button')
     likeButton.classList.toggle('card__like-button_is-active');
+}
+
+function isLiked(cardElement) {
+    const likeButton = cardElement.querySelector('.card__like-button')
     return likeButton.classList.contains('card__like-button_is-active');
 }
 
